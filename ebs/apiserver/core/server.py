@@ -1,20 +1,21 @@
 
 
 from uvicorn import Config, Server
+from fastapi import FastAPI
 
 from .log import setup_logging
-
-# TODO Should an empty Application Object be created here instead of leaving it to the client?
 
 from ebs.apiserver.config import BIND_IP
 from ebs.apiserver.config import PORT
 from ebs.apiserver.config import LOG_LEVEL
 
+app = FastAPI()
 
-def run_server(server_object):
+
+def run_server():
     server = Server(
         Config(
-            server_object,
+            app,
             host=BIND_IP,
             port=PORT,
             log_level=LOG_LEVEL,
