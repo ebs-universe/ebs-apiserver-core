@@ -3,6 +3,7 @@
 import os
 from uvicorn import Config, Server
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from .log import setup_logging
 
@@ -21,11 +22,13 @@ def server_basic_options():
     from ebs.apiserver.config import BIND_IP
     from ebs.apiserver.config import PORT
     from ebs.apiserver.config import LOG_LEVEL
+    from ebs.apiserver.config import AUTO_RELOAD
 
     return {
         "host": BIND_IP,
         "port": PORT,
-        "log_level": LOG_LEVEL
+        "log_level": LOG_LEVEL,
+        "reload": AUTO_RELOAD,
     }
 
 
@@ -36,7 +39,7 @@ def _default_certificates():
     }
 
 
-def server_security_options():
+def server_ssl_options():
     from ebs.apiserver.config import ENABLE_SSL
     if not ENABLE_SSL:
         return {}
@@ -65,9 +68,25 @@ def server_security_options():
     }
 
 
+def prepare_app():
+    from ebs.apiserver.config import CORS_ORIGINS
+    from ebs.apiserver.config import CORS_METHODS
+    from ebs.apiserver.config import CORS_HEADERS
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=CORS_ORIGINS,
+        allow_credentials=True,
+        allow_methods=CORS_METHODS,
+        allow_headers=CORS_HEADERS
+    )
+
+
 def run_server():
     server_opts = server_basic_options()
-    server_opts.update(server_security_options())
+    server_opts.update(server_ssl_options())
+
+    prepare_app()
 
     server = Server(
         Config(

@@ -39,6 +39,16 @@ config_elements_server = [
         parser=int
     ),
     ConfigOption(
+        'AUTO_RELOAD', "False",
+        "Automatically reload the server on changes. This might actually "
+        "not have any real effects and probably should be left alone in production.",
+        parser=bool
+    )
+]
+
+
+config_elements_server_ssl = [
+    ConfigOption(
         'ENABLE_SSL', "True",
         "Whether to use TLS/SSL connections.",
         parser=bool
@@ -54,7 +64,27 @@ config_elements_server = [
 ]
 
 
+config_elements_server_security = [
+    ConfigOption(
+        'CORS_ORIGINS', "['*']",
+        "List of CORS Origins."
+    ),
+    ConfigOption(
+        'CORS_METHODS', "['*']",
+        "List of CORS Methods."
+    ),
+    ConfigOption(
+        'CORS_HEADERS', "['*']",
+        "List of CORS Headers."
+    )
+]
+
+
 def load(manager):
     logger.debug("Loading {0}".format(__name__))
     manager.load_elements(config_elements_server,
                           doc="API Server Configuration")
+    manager.load_elements(config_elements_server_ssl,
+                          doc="API Server SSL Configuration")
+    manager.load_elements(config_elements_server_security,
+                          doc="API Server Security Configuration")
