@@ -38,6 +38,19 @@ config_elements_server = [
         "Port the server should listen on.",
         parser=int
     ),
+    ConfigOption(
+        'ENABLE_SSL', "True",
+        "Whether to use TLS/SSL connections.",
+        parser=bool
+    ),
+    ConfigOption(
+        'SSL_KEYFILE', "''",
+        "Path to the SSL Key to use."
+    ),
+    ConfigOption(
+        'SSL_CERTFILE', "''",
+        "Path to the SSL Certificate to use."
+    )
 ]
 
 
