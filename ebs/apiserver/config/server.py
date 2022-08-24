@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
 # Copyright (C) 2022 Chintalagiri Shashank
 #
 # This file is part of EBS API Server.
@@ -17,20 +14,34 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+Server Configuration Options
+============================
+"""
 
-from pkgutil import extend_path
-__path__ = extend_path(__path__, __name__)
 
-try:
-    from ebs.apiserver.config.appname import appname
-except ImportError:
-    appname = 'apiserver'
+from tendril.utils.config import ConfigOption
 
-from tendril.utils.config import ConfigManager
-_manager = ConfigManager(prefix='ebs.apiserver.config',
-                         legacy=None,
-                         excluded=['ebs.apiserver.config.appname'],
-                         appname=appname)
+import logging
+logger = logging.getLogger(__name__)
 
-import sys
-sys.modules[__name__] = _manager
+depends = ['ebs.apiserver.config.core']
+
+
+config_elements_server = [
+    ConfigOption(
+        'BIND_IP', "'0.0.0.0'",
+        "IP Address the server should bind to. See uvicorn.Server and uvicorn.Config."
+    ),
+    ConfigOption(
+        'PORT', "8039",
+        "Port the server should listen on.",
+        parser=int
+    ),
+]
+
+
+def load(manager):
+    logger.debug("Loading {0}".format(__name__))
+    manager.load_elements(config_elements_server,
+                          doc="API Server Configuration")

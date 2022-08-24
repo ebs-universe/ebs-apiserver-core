@@ -30,10 +30,24 @@ logger = logging.getLogger(__name__)
 depends = []
 
 
+config_constants_environment = [
+    ConfigConstant(
+        'ALLOW_ENVIRONMENT_OVERRIDES',
+        "True",
+        'Whether config options can be overridden from the environment.'
+    ),
+    ConfigConstant(
+        'ENVIRONMENT_OVERRIDE_PREFIX',
+        "'{}_'.format(APPNAME.upper())",
+        'Environment variable name prefix.'
+    ),
+]
+
+
 config_constants_basic = [
     ConfigConstant(
         'INSTANCE_ROOT',
-        "os.path.join(os.path.expanduser('~'), '.ebs', 'apiserver')",
+        "os.path.join(os.path.expanduser('~'), '.config', APPNAME)",
         "Path to the EBS API Server instance root. Can be redirected "
         "if necessary with a file named ``redirect`` in this folder."
     )
@@ -53,9 +67,21 @@ config_constants_redirected = [
     ),
 ]
 
+config_constants_external = [
+    ConfigConstant(
+        'EXTERNAL_CONFIG_SOURCES',
+        "os.path.join(INSTANCE_ROOT, 'external_configs.yaml')",
+        "Path to a yaml definition file mapping to external config sources."
+    )
+]
+
 
 def load(manager):
     logger.debug("Loading {0}".format(__name__))
+
+    manager.load_elements(config_constants_environment,
+                          doc="Environment Variable Override Configuration")
+
     manager.load_elements(config_constants_basic,
                           doc="EBS API Server Instance Root")
 
@@ -66,4 +92,8 @@ def load(manager):
 
     manager.load_elements(config_constants_redirected,
                           doc="EBS API Server Configuration Paths")
+
+    manager.load_elements(config_constants_external,
+                          doc="External Configuration Paths")
+
     manager.load_config_files()

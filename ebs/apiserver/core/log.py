@@ -5,11 +5,9 @@ import logging
 import sys
 from loguru import logger
 
-
-# TODO Get these (and other logging controls) from config instead
-LOG_LEVEL = logging.getLevelName(os.environ.get("APISERVER_LOG_LEVEL", "INFO"))
-JSON_LOGS = True if os.environ.get("APISERVER_JSON_LOGS", "0") == "1" else False
-LOGPATH = os.environ.get("APISERVER_LOG_PATH", "/var/log/ebs/apiserver.log")
+from ebs.apiserver.config import LOG_LEVEL
+from ebs.apiserver.config import JSON_LOGS
+from ebs.apiserver.config import LOG_PATH
 
 
 class InterceptHandler(logging.Handler):
@@ -43,8 +41,8 @@ def setup_logging():
     # configure loguru
     logger.configure(handlers=[{"sink": sys.stdout, "serialize": JSON_LOGS}])
 
-    logdir = os.path.split(LOGPATH)[0]
+    logdir = os.path.split(LOG_PATH)[0]
     if not os.path.exists(logdir):
         os.makedirs(logdir)
-    logger.add(LOGPATH, level="INFO",
+    logger.add(LOG_PATH, level="INFO",
                rotation="1 week", retention="14 days")

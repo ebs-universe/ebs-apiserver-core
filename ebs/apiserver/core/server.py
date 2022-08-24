@@ -1,21 +1,21 @@
 
 
-import os
-import logging
 from uvicorn import Config, Server
 
 from .log import setup_logging
 
-# TODO Get these (and other server controls) from config instead
-PORT = int(os.environ.get("APISERVER_PORT", "8039"))
-LOG_LEVEL = logging.getLevelName(os.environ.get("APISERVER_LOG_LEVEL", "INFO"))
+# TODO Should an empty Application Object be created here instead of leaving it to the client?
+
+from ebs.apiserver.config import BIND_IP
+from ebs.apiserver.config import PORT
+from ebs.apiserver.config import LOG_LEVEL
 
 
 def run_server(server_object):
     server = Server(
         Config(
             server_object,
-            host="0.0.0.0",
+            host=BIND_IP,
             port=PORT,
             log_level=LOG_LEVEL,
         ),
